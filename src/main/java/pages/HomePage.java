@@ -1,42 +1,44 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.*;
+
 import java.time.Duration;
 
 public class HomePage {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    private By contactLink = By.id("nav-contact");  // ✅ simplified locator
-    private By shopLink = By.id("nav-shop");        // ✅ simplified locator
-    private By cartLink = By.id("nav-cart");
+    // Use link text instead of fragile CSS ids
+    private By contactLink = By.linkText("Contact");
+    private By shopLink = By.linkText("Shop");
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20)); // increased to 20s
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
     public void goToContactPage() {
-        wait.until(ExpectedConditions.elementToBeClickable(contactLink)).click();
+        WebElement contact = wait.until(ExpectedConditions.elementToBeClickable(contactLink));
+        scrollIntoView(contact);
+        contact.click();
         waitForPageLoad();
     }
 
     public void goToShopPage() {
-        wait.until(ExpectedConditions.elementToBeClickable(shopLink)).click();
+        WebElement shop = wait.until(ExpectedConditions.elementToBeClickable(shopLink));
+        scrollIntoView(shop);
+        shop.click();
         waitForPageLoad();
     }
 
-    public void goToCartPage() {
-        wait.until(ExpectedConditions.elementToBeClickable(cartLink)).click();
-        waitForPageLoad();
+    private void scrollIntoView(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
     }
 
     private void waitForPageLoad() {
-        // Angular ng-view takes time → wait until container is visible
-        By container = By.cssSelector("div.container-fluid[ng-view]");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(container));
+        // Wait for Angular ng-view container to show up
+        By viewContainer = By.cssSelector("div[ng-view]");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(viewContainer));
     }
 }
