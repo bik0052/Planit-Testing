@@ -3,6 +3,7 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import java.util.List;
 
 public class CartPage {
@@ -12,23 +13,36 @@ public class CartPage {
         this.driver = driver;
     }
 
-    public double getProductPrice(String product) {
-        String price = driver.findElement(By.xpath("//td[text()='" + product + "']/following-sibling::td[1]")).getText().replace("$", "");
-        return Double.parseDouble(price);
+    private WebElement getRowForProduct(String productName) {
+        List<WebElement> rows = driver.findElements(By.cssSelector("table.cart tbody tr"));
+        for (WebElement row : rows) {
+            if (row.getText().contains(productName)) {
+                return row;
+            }
+        }
+        throw new RuntimeException("Product not found in cart: " + productName);
     }
 
-    public double getProductSubtotal(String product) {
-        String subtotal = driver.findElement(By.xpath("//td[text()='" + product + "']/following-sibling::td[3]")).getText().replace("$", "");
-        return Double.parseDouble(subtotal);
+    public double getProductPrice(String productName) {
+        WebElement row = getRowForProduct(productName);
+        return Double.parseDouble(
+                row.findElement(By.cssSelector("td:nth-child(2)")).getText().replace("$", "")
+        );
     }
 
-    public int getProductQuantity(String product) {
-        WebElement qty = driver.findElement(By.xpath("//td[text()='" + product + "']/following-sibling::td[2]/input"));
-        return Integer.parseInt(qty.getAttribute("value"));
+    public double getProductSubtotal(String productName) {
+        WebElement row = getRowForProduct(productName);
+        return Double.parseDouble(
+                row.findElement(By.cssSelector("td:nth-child(4)")).getText().replace("$", "")
+        );
     }
 
     public double getTotal() {
-        String total = driver.findElement(By.cssSelector("tfoot .total")).getText().replace("Total: ", "").replace("$", "");
-        return Double.parseDouble(total);
+        return Double.parseDouble(
+                driver.findElement(By.cssSelector("strong.total"))
+                      .getText()
+                      .replace("Total: ", "")
+                      .replace("$", "")
+        );
     }
 }
