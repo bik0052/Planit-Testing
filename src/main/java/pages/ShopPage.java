@@ -1,10 +1,7 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
 
@@ -14,32 +11,49 @@ public class ShopPage {
 
     public ShopPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    }
+
+    private By buyButton(String productName) {
+        // Find the Buy button for a given product name
+        return By.xpath("//h4[text()='" + productName + "']/following-sibling::p//a[contains(text(),'Buy')]");
+    }
+
+    private By cartLink = By.linkText("Cart");
+
+    public void buyStuffedFrog(int quantity) {
+        buyProduct("Stuffed Frog", quantity);
+    }
+
+    public void buyFluffyBunny(int quantity) {
+        buyProduct("Fluffy Bunny", quantity);
+    }
+
+    public void buyValentineBear(int quantity) {
+        buyProduct("Valentine Bear", quantity);
     }
 
     private void buyProduct(String productName, int quantity) {
-        By buyButton = By.xpath("//h4[text()='" + productName + "']/following-sibling::p/a");
-        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(buyButton));
         for (int i = 0; i < quantity; i++) {
+            WebElement button = wait.until(ExpectedConditions.elementToBeClickable(buyButton(productName)));
+            scrollIntoView(button);
             button.click();
         }
     }
 
-    public void buyStuffedFrog(int qty) {
-        buyProduct("Stuffed Frog", qty);
-    }
-
-    public void buyFluffyBunny(int qty) {
-        buyProduct("Fluffy Bunny", qty);
-    }
-
-    public void buyValentineBear(int qty) {
-        buyProduct("Valentine Bear", qty);
-    }
-
     public void goToCart() {
-        By cartLink = By.cssSelector("#nav-cart a");
         WebElement cart = wait.until(ExpectedConditions.elementToBeClickable(cartLink));
+        scrollIntoView(cart);
         cart.click();
+        waitForPageLoad();
+    }
+
+    private void scrollIntoView(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+    }
+
+    private void waitForPageLoad() {
+        By viewContainer = By.cssSelector("div[ng-view]");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(viewContainer));
     }
 }
