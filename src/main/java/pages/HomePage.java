@@ -2,27 +2,32 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import java.time.Duration;
 
 public class HomePage {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    private By contactLink = By.linkText("Contact");
-    private By shopLink = By.linkText("Shop");
+    // Navbar locators from page source
+    private By contactLink = By.cssSelector("#nav-contact a");
+    private By shopLink = By.cssSelector("#nav-shop a");
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
     public void goToContactPage() {
-        wait.until(ExpectedConditions.elementToBeClickable(contactLink)).click();
+        WebElement contact = wait.until(ExpectedConditions.elementToBeClickable(contactLink));
+        contact.click();
     }
 
     public void goToShopPage() {
-        wait.until(ExpectedConditions.elementToBeClickable(shopLink)).click();
+        WebElement shop = wait.until(ExpectedConditions.elementToBeClickable(shopLink));
+        shop.click();
     }
 }
