@@ -1,4 +1,4 @@
-package tests;
+package com.planit.tests;
 
 import com.planit.base.BaseTest;
 import org.testng.Assert;
