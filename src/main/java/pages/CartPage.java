@@ -1,48 +1,49 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.*;
 
-import java.util.List;
+import java.time.Duration;
 
 public class CartPage {
     private WebDriver driver;
+    private WebDriverWait wait;
 
     public CartPage(WebDriver driver) {
         this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-    private WebElement getRowForProduct(String productName) {
-        List<WebElement> rows = driver.findElements(By.cssSelector("table.cart tbody tr"));
-        for (WebElement row : rows) {
-            if (row.getText().contains(productName)) {
-                return row;
-            }
-        }
-        throw new RuntimeException("Product not found in cart: " + productName);
+    private By productRow(String productName) {
+        return By.xpath("//tr[td[normalize-space()='" + productName + "']]");
     }
+
+    private By priceCell(String productName) {
+        return By.xpath("//tr[td[normalize-space()='" + productName + "']]/td[2]");
+    }
+
+    private By subtotalCell(String productName) {
+        return By.xpath("//tr[td[normalize-space()='" + productName + "']]/td[4]");
+    }
+
+    private By total = By.id("total");
 
     public double getProductPrice(String productName) {
-        WebElement row = getRowForProduct(productName);
-        return Double.parseDouble(
-                row.findElement(By.cssSelector("td:nth-child(2)")).getText().replace("$", "")
-        );
+        String priceText = wait.until(ExpectedConditions.visibilityOfElementLocated(priceCell(productName))).getText();
+        return parsePrice(priceText);
     }
 
     public double getProductSubtotal(String productName) {
-        WebElement row = getRowForProduct(productName);
-        return Double.parseDouble(
-                row.findElement(By.cssSelector("td:nth-child(4)")).getText().replace("$", "")
-        );
+        String subtotalText = wait.until(ExpectedConditions.visibilityOfElementLocated(subtotalCell(productName))).getText();
+        return parsePrice(subtotalText);
     }
 
     public double getTotal() {
-        return Double.parseDouble(
-                driver.findElement(By.cssSelector("strong.total"))
-                      .getText()
-                      .replace("Total: ", "")
-                      .replace("$", "")
-        );
+        String totalText = wait.until(ExpectedConditions.visibilityOfElementLocated(total)).getText();
+        return parsePrice(totalText);
+    }
+
+    private double parsePrice(String text) {
+        return Double.parseDouble(text.replace("$", "").trim());
     }
 }
