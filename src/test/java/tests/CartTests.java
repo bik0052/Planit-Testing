@@ -26,11 +26,11 @@ public class CartTests extends BaseTest {
         double fluffyBunnyPrice = cart.getProductPrice("Fluffy Bunny");
         double valentineBearPrice = cart.getProductPrice("Valentine Bear");
 
-        Assert.assertEquals(cart.getProductSubtotal("Stuffed Frog"), stuffedFrogPrice * 2);
-        Assert.assertEquals(cart.getProductSubtotal("Fluffy Bunny"), fluffyBunnyPrice * 5);
-        Assert.assertEquals(cart.getProductSubtotal("Valentine Bear"), valentineBearPrice * 3);
+        Assert.assertEquals(cart.getProductSubtotal("Stuffed Frog"), stuffedFrogPrice * 2, "Subtotal mismatch for Stuffed Frog");
+        Assert.assertEquals(cart.getProductSubtotal("Fluffy Bunny"), fluffyBunnyPrice * 5, "Subtotal mismatch for Fluffy Bunny");
+        Assert.assertEquals(cart.getProductSubtotal("Valentine Bear"), valentineBearPrice * 3, "Subtotal mismatch for Valentine Bear");
 
         double expectedTotal = (stuffedFrogPrice * 2) + (fluffyBunnyPrice * 5) + (valentineBearPrice * 3);
-        Assert.assertEquals(cart.getTotal(), expectedTotal);
+        Assert.assertEquals(cart.getTotal(), expectedTotal, "Cart total mismatch");
     }
 }
