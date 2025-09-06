@@ -1,40 +1,38 @@
 package pages;
 
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
 public class ShopPage {
-    private WebDriver driver;
-    private WebDriverWait wait;
+    private final WebDriver driver;
+    private final WebDriverWait wait;
+
+    private final By cartLink = By.linkText("Cart");
+    private final By ngView = By.cssSelector("div[ng-view]");
 
     public ShopPage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
+    }
+
+    private By productCard(String productName) {
+        return By.xpath("//h4[normalize-space()='" + productName + "']/ancestor::li");
     }
 
     private By buyButton(String productName) {
-        // Find the Buy button for a given product name
-        return By.xpath("//h4[text()='" + productName + "']/following-sibling::p//a[contains(text(),'Buy')]");
+        return By.xpath("//h4[normalize-space()='" + productName + "']/following::a[contains(.,'Buy')][1]");
     }
 
-    private By cartLink = By.linkText("Cart");
+    public void buyStuffedFrog(int qty) { buyProduct("Stuffed Frog", qty); }
+    public void buyFluffyBunny(int qty) { buyProduct("Fluffy Bunny", qty); }
+    public void buyValentineBear(int qty) { buyProduct("Valentine Bear", qty); }
 
-    public void buyStuffedFrog(int quantity) {
-        buyProduct("Stuffed Frog", quantity);
-    }
-
-    public void buyFluffyBunny(int quantity) {
-        buyProduct("Fluffy Bunny", quantity);
-    }
-
-    public void buyValentineBear(int quantity) {
-        buyProduct("Valentine Bear", quantity);
-    }
-
-    private void buyProduct(String productName, int quantity) {
-        for (int i = 0; i < quantity; i++) {
+    private void buyProduct(String productName, int qty) {
+        for (int i = 0; i < qty; i++) {
             WebElement button = wait.until(ExpectedConditions.elementToBeClickable(buyButton(productName)));
             scrollIntoView(button);
             button.click();
@@ -42,18 +40,13 @@ public class ShopPage {
     }
 
     public void goToCart() {
-        WebElement cart = wait.until(ExpectedConditions.elementToBeClickable(cartLink));
-        scrollIntoView(cart);
-        cart.click();
-        waitForPageLoad();
+        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(cartLink));
+        scrollIntoView(el);
+        el.click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
     }
 
     private void scrollIntoView(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-    }
-
-    private void waitForPageLoad() {
-        By viewContainer = By.cssSelector("div[ng-view]");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(viewContainer));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", element);
     }
 }
