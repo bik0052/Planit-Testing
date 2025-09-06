@@ -2,9 +2,9 @@ package com.planit.tests;
 
 import org.testng.annotations.Test;
 import com.planit.base.BaseTest;
-import com.planit.pageObjects.HomePage;
-import com.planit.pageObjects.ShopPage;
-import com.planit.pageObjects.CartPage;
+import com.planit.pages.HomePage;
+import com.planit.pages.ShopPage;
+import com.planit.pages.CartPage;
 
 import static org.testng.Assert.assertEquals;
 
