@@ -1,72 +1,65 @@
 package pages;
 
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
 public class ContactPage {
-    private WebDriver driver;
-    private WebDriverWait wait;
+    private final WebDriver driver;
+    private final WebDriverWait wait;
 
     public ContactPage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-    // Fields
-    private By forenameField = By.id("forename");
-    private By emailField = By.id("email");
-    private By messageField = By.id("message");
-
-    // Buttons
-    private By submitButton = By.linkText("Submit");
-
-    // Error messages
-    private By forenameError = By.id("forename-err");
-    private By emailError = By.id("email-err");
-    private By messageError = By.id("message-err");
-
-    // Success
-    private By successMsg = By.cssSelector(".alert-success");
+    private final By forename = By.id("forename");
+    private final By email = By.id("email");
+    private final By message = By.id("message");
+    private final By submit = By.linkText("Submit"); // falls back to anchor text
+    private final By forenameErr = By.id("forename-err");
+    private final By emailErr = By.id("email-err");
+    private final By messageErr = By.id("message-err");
+    private final By successAlert = By.cssSelector(".alert-success");
 
     public void clickSubmit() {
-        WebElement submit = wait.until(ExpectedConditions.elementToBeClickable(submitButton));
-        scrollIntoView(submit);
-        submit.click();
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(submit));
+        scrollIntoView(btn);
+        btn.click();
     }
 
-    public void fillMandatoryFields(String forename, String email, String message) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(forenameField)).sendKeys(forename);
-        driver.findElement(emailField).sendKeys(email);
-        driver.findElement(messageField).sendKeys(message);
+    public void fillMandatoryFields(String name, String mail, String msg) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(forename)).clear();
+        driver.findElement(forename).sendKeys(name);
+
+        driver.findElement(email).clear();
+        driver.findElement(email).sendKeys(mail);
+
+        driver.findElement(message).clear();
+        driver.findElement(message).sendKeys(msg);
     }
 
     public String getForenameError() {
-        return getTextIfPresent(forenameError);
+        return getTextIfPresent(forenameErr);
     }
-
-    public String getEmailError() {
-        return getTextIfPresent(emailError);
-    }
-
-    public String getMessageError() {
-        return getTextIfPresent(messageError);
-    }
+    public String getEmailError() { return getTextIfPresent(emailErr); }
+    public String getMessageError() { return getTextIfPresent(messageErr); }
 
     public String getSuccessMsg() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(successMsg)).getText();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(successAlert)).getText();
     }
 
     private String getTextIfPresent(By locator) {
         try {
-            return driver.findElement(locator).getText();
+            return driver.findElement(locator).getText().trim();
         } catch (NoSuchElementException e) {
             return "";
         }
     }
 
     private void scrollIntoView(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", element);
     }
 }
