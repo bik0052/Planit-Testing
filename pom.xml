@@ -32,12 +32,11 @@
             <version>5.9.2</version>
         </dependency>
 
-        <!-- TestNG for running tests -->
+        <!-- TestNG (compile scope so BaseTest.java in main can use it) -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>7.9.0</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- Assertions (optional, can also use TestNG assertions) -->
@@ -51,36 +50,4 @@
         <!-- ExtentReports (disabled for now, but ready for later) -->
         <dependency>
             <groupId>com.aventstack</groupId>
-            <artifactId>extentreports</artifactId>
-            <version>5.1.1</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <!-- Compiler Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <release>17</release>
-                </configuration>
-            </plugin>
-
-            <!-- Surefire Plugin for running TestNG tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <useSystemClassLoader>true</useSystemClassLoader>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+            <artifactId>extentreports</artifactId
