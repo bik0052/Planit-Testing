@@ -1,39 +1,44 @@
 package com.planit.tests;
 
-import com.planit.base.BaseTest;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-import pages.ContactPage;
-import pages.HomePage;
+import com.planit.base.BaseTest;
+import com.planit.pages.ContactPage;
+import com.planit.pages.HomePage;
+
+import static org.testng.Assert.assertTrue;
 
 public class ContactTests extends BaseTest {
 
-    @Test(priority = 1)
-    public void validateContactErrors() {
+    @Test(description = "Verify mandatory error messages appear and disappear correctly")
+    public void verifyErrorMessages() {
         HomePage home = new HomePage(driver);
-        home.goToContactPage();
+        ContactPage contact = home.clickContact();
 
-        ContactPage contact = new ContactPage(driver);
+        // Click submit without filling
         contact.clickSubmit();
+        assertTrue(contact.isErrorVisible("Forename is required"));
+        assertTrue(contact.isErrorVisible("Email is required"));
+        assertTrue(contact.isErrorVisible("Message is required"));
 
-        Assert.assertTrue(contact.getForenameError().toLowerCase().contains("forename"),
-                "Forename validation not shown");
-        Assert.assertTrue(contact.getEmailError().toLowerCase().contains("email"),
-                "Email validation not shown");
-        Assert.assertTrue(contact.getMessageError().toLowerCase().contains("message"),
-                "Message validation not shown");
+        // Fill mandatory fields
+        contact.setForename("John");
+        contact.setEmail("john@test.com");
+        contact.setMessage("Hello!");
+
+        // Verify errors are gone
+        assertTrue(contact.noErrorsVisible());
     }
 
-    @Test(priority = 2)
-    public void submitContactFormSuccessfully() {
+    @Test(description = "Verify successful submission message, runs 5 times", invocationCount = 5)
+    public void verifySuccessfulSubmission() {
         HomePage home = new HomePage(driver);
-        home.goToContactPage();
+        ContactPage contact = home.clickContact();
 
-        ContactPage contact = new ContactPage(driver);
-        contact.fillMandatoryFields("John", "john@test.com", "Automation test");
+        contact.setForename("John");
+        contact.setEmail("john@test.com");
+        contact.setMessage("Automated Test Message");
         contact.clickSubmit();
 
-        Assert.assertTrue(contact.getSuccessMsg().toLowerCase().contains("we appreciate your feedback"),
-                "Success message not displayed correctly");
+        assertTrue(contact.isSubmissionSuccess());
     }
 }
