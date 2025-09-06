@@ -1,36 +1,43 @@
 package com.planit.tests;
 
-import com.planit.base.BaseTest;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-import pages.CartPage;
-import pages.HomePage;
-import pages.ShopPage;
+import com.planit.base.BaseTest;
+import com.planit.pages.HomePage;
+import com.planit.pages.ShopPage;
+import com.planit.pages.CartPage;
+
+import static org.testng.Assert.assertEquals;
 
 public class CartTests extends BaseTest {
 
-    @Test(priority = 3)
-    public void validateCartTotals() {
+    @Test(description = "Verify cart calculations for multiple products")
+    public void verifyCartCalculations() {
         HomePage home = new HomePage(driver);
-        home.goToShopPage();
+        ShopPage shop = home.clickShop();
 
-        ShopPage shop = new ShopPage(driver);
-        shop.buyStuffedFrog(2);
-        shop.buyFluffyBunny(5);
-        shop.buyValentineBear(3);
-        shop.goToCart();
+        shop.buy("Stuffed Frog", 2);
+        shop.buy("Fluffy Bunny", 5);
+        shop.buy("Valentine Bear", 3);
 
-        CartPage cart = new CartPage(driver);
+        CartPage cart = shop.clickCart();
 
-        double stuffedFrogPrice = cart.getProductPrice("Stuffed Frog");
-        double fluffyBunnyPrice = cart.getProductPrice("Fluffy Bunny");
-        double valentineBearPrice = cart.getProductPrice("Valentine Bear");
+        // Expected prices
+        double frogPrice = 10.99;
+        double bunnyPrice = 9.99;
+        double bearPrice = 14.99;
 
-        Assert.assertEquals(cart.getProductSubtotal("Stuffed Frog"), stuffedFrogPrice * 2, 0.01);
-        Assert.assertEquals(cart.getProductSubtotal("Fluffy Bunny"), fluffyBunnyPrice * 5, 0.01);
-        Assert.assertEquals(cart.getProductSubtotal("Valentine Bear"), valentineBearPrice * 3, 0.01);
+        // Verify subtotals
+        assertEquals(cart.getSubtotal("Stuffed Frog"), frogPrice * 2, "Stuffed Frog subtotal mismatch");
+        assertEquals(cart.getSubtotal("Fluffy Bunny"), bunnyPrice * 5, "Fluffy Bunny subtotal mismatch");
+        assertEquals(cart.getSubtotal("Valentine Bear"), bearPrice * 3, "Valentine Bear subtotal mismatch");
 
-        double expectedTotal = (stuffedFrogPrice * 2) + (fluffyBunnyPrice * 5) + (valentineBearPrice * 3);
-        Assert.assertEquals(cart.getTotal(), expectedTotal, 0.01, "Cart total mismatch");
+        // Verify unit prices
+        assertEquals(cart.getPrice("Stuffed Frog"), frogPrice);
+        assertEquals(cart.getPrice("Fluffy Bunny"), bunnyPrice);
+        assertEquals(cart.getPrice("Valentine Bear"), bearPrice);
+
+        // Verify total = sum of subtotals
+        double expectedTotal = (frogPrice * 2) + (bunnyPrice * 5) + (bearPrice * 3);
+        assertEquals(cart.getTotal(), expectedTotal, "Cart total mismatch");
     }
 }
