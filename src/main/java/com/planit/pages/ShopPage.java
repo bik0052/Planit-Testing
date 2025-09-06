@@ -1,54 +1,33 @@
-
 package com.planit.pages;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
-import java.time.Duration;
+public class ShopPage extends BasePage {
 
-public class ShopPage {
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+    // Generic locator for a product card by product name, then its Buy button
+    private By buyButtonFor(String productName) {
+        // Find the product tile by its title (h4) and then the Buy button within the same tile
+        String xp = "//h4[normalize-space()='" + productName + "']/ancestor::div[contains(@class,'product')]//a[contains(.,'Buy')]";
+        return By.xpath(xp);
+    }
 
-    private final By cartLink = By.linkText("Cart");
-    private final By ngView = By.cssSelector("div[ng-view]");
+    private final By navCart = By.linkText("Cart");
 
     public ShopPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
+        super(driver);
     }
 
-    private By productCard(String productName) {
-        return By.xpath("//h4[normalize-space()='" + productName + "']/ancestor::li");
-    }
-
-    private By buyButton(String productName) {
-        return By.xpath("//h4[normalize-space()='" + productName + "']/following::a[contains(.,'Buy')][1]");
-    }
-
-    public void buyStuffedFrog(int qty) { buyProduct("Stuffed Frog", qty); }
-    public void buyFluffyBunny(int qty) { buyProduct("Fluffy Bunny", qty); }
-    public void buyValentineBear(int qty) { buyProduct("Valentine Bear", qty); }
-
-    private void buyProduct(String productName, int qty) {
+    /** Clicks the Buy button for the given product qty times. */
+    public void buy(String productName, int qty) {
         for (int i = 0; i < qty; i++) {
-            WebElement button = wait.until(ExpectedConditions.elementToBeClickable(buyButton(productName)));
-            scrollIntoView(button);
-            button.click();
+            click(buyButtonFor(productName));
         }
     }
 
-    public void goToCart() {
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(cartLink));
-        scrollIntoView(el);
-        el.click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
-    }
-
-    private void scrollIntoView(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", element);
+    public CartPage clickCart() {
+        click(navCart);
+        return new CartPage(driver);
     }
 }
-
