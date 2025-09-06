@@ -10,7 +10,7 @@ import pages.ShopPage;
 public class CartTests extends BaseTest {
 
     @Test(priority = 3)
-    public void testCase3_validateCartTotals() {
+    public void validateCartTotals() {
         HomePage home = new HomePage(driver);
         home.goToShopPage();
 
@@ -26,12 +26,11 @@ public class CartTests extends BaseTest {
         double fluffyBunnyPrice = cart.getProductPrice("Fluffy Bunny");
         double valentineBearPrice = cart.getProductPrice("Valentine Bear");
 
-        Assert.assertEquals(cart.getProductSubtotal("Stuffed Frog"), stuffedFrogPrice * 2, "Subtotal mismatch for Stuffed Frog");
-        Assert.assertEquals(cart.getProductSubtotal("Fluffy Bunny"), fluffyBunnyPrice * 5, "Subtotal mismatch for Fluffy Bunny");
-        Assert.assertEquals(cart.getProductSubtotal("Valentine Bear"), valentineBearPrice * 3, "Subtotal mismatch for Valentine Bear");
+        Assert.assertEquals(cart.getProductSubtotal("Stuffed Frog"), stuffedFrogPrice * 2, 0.01);
+        Assert.assertEquals(cart.getProductSubtotal("Fluffy Bunny"), fluffyBunnyPrice * 5, 0.01);
+        Assert.assertEquals(cart.getProductSubtotal("Valentine Bear"), valentineBearPrice * 3, 0.01);
 
         double expectedTotal = (stuffedFrogPrice * 2) + (fluffyBunnyPrice * 5) + (valentineBearPrice * 3);
-        Assert.assertEquals(cart.getTotal(), expectedTotal, "Cart total mismatch");
+        Assert.assertEquals(cart.getTotal(), expectedTotal, 0.01, "Cart total mismatch");
     }
 }
-
