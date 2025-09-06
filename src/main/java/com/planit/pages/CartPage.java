@@ -1,52 +1,50 @@
-
 package com.planit.pages;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import java.util.List;
 
-import java.time.Duration;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
-public class CartPage {
-    private final WebDriver driver;
-    private final WebDriverWait wait;
+public class CartPage extends BasePage {
 
     public CartPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        super(driver);
     }
 
-    private By row(String product) {
-        return By.xpath("//tr[.//td[normalize-space()='" + product + "']]");
+    private WebElement rowFor(String productName) {
+        // Row that has a td with the product name
+        String xp = "//table//tr[td[normalize-space()='" + productName + "']]";
+        return waitVisible(By.xpath(xp));
     }
 
-    private By priceCell(String product) {
-        return By.xpath("//tr[.//td[normalize-space()='" + product + "']]/td[2]");
+    /** Returns the unit price shown in the cart row for the product. */
+    public double getPrice(String productName) {
+        WebElement row = rowFor(productName);
+        // Heuristic: first $-containing cell in the row is the unit price
+        List<WebElement> moneyCells = row.findElements(By.xpath(".//td[contains(.,'$')]"));
+        if (moneyCells.isEmpty()) {
+            throw new IllegalStateException("No price cells found for product: " + productName);
+        }
+        return parseMoney(moneyCells.get(0).getText());
     }
 
-    private By subtotalCell(String product) {
-        return By.xpath("//tr[.//td[normalize-space()='" + product + "']]/td[last()-1]");
+    /** Returns the subtotal shown in the cart row for the product. */
+    public double getSubtotal(String productName) {
+        WebElement row = rowFor(productName);
+        // Heuristic: last $-containing cell in the row is the subtotal
+        List<WebElement> moneyCells = row.findElements(By.xpath(".//td[contains(.,'$')]"));
+        if (moneyCells.isEmpty()) {
+            throw new IllegalStateException("No subtotal cells found for product: " + productName);
+        }
+        return parseMoney(moneyCells.get(moneyCells.size() - 1).getText());
     }
 
-    private final By totalCell = By.cssSelector("strong.total"); // fallback to 'strong.total' present on site
-
-    public double getProductPrice(String product) {
-        String txt = wait.until(ExpectedConditions.visibilityOfElementLocated(priceCell(product))).getText();
-        return parsePrice(txt);
-    }
-
-    public double getProductSubtotal(String product) {
-        String txt = wait.until(ExpectedConditions.visibilityOfElementLocated(subtotalCell(product))).getText();
-        return parsePrice(txt);
-    }
-
+    /** Returns the cart total shown at the bottom of the table. */
     public double getTotal() {
-        String txt = wait.until(ExpectedConditions.visibilityOfElementLocated(totalCell)).getText();
-        return parsePrice(txt);
-    }
-
-    private double parsePrice(String text) {
-        return Double.parseDouble(text.replace("$","").trim());
+        // Works with "Total: $XX.XX" found in strong/span/td, etc.
+        By totalLocator = By.xpath("//*[self::strong or self::span or self::td][contains(normalize-space(),'Total') and contains(.,'$')]");
+        WebElement totalEl = waitVisible(totalLocator);
+        return parseMoney(totalEl.getText());
     }
 }
-
