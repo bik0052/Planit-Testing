@@ -2,8 +2,8 @@ package com.planit.tests;
 
 import org.testng.annotations.Test;
 import com.planit.base.BaseTest;
-import com.planit.pages.ContactPage;
-import com.planit.pages.HomePage;
+import com.planit.pageObjects.ContactPage;
+import com.planit.pageObjects.HomePage;
 
 import static org.testng.Assert.assertTrue;
 
