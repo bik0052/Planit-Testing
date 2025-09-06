@@ -2,8 +2,8 @@ package com.planit.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -13,22 +13,34 @@ public class DriverFactory {
 
     public static WebDriver createDriver(String browser, boolean headless) {
         switch (browser.toLowerCase()) {
-            case "firefox":
+            case "firefox": {
                 WebDriverManager.firefoxdriver().setup();
-                FirefoxOptions fOpts = new FirefoxOptions();
-                if (headless) fOpts.addArguments("--headless");
-                return new FirefoxDriver(fOpts);
-            case "edge":
+                FirefoxOptions opts = new FirefoxOptions();
+                if (headless) opts.addArguments("-headless");
+                opts.addArguments("--width=1920", "--height=1080");
+                return new FirefoxDriver(opts);
+            }
+            case "edge": {
                 WebDriverManager.edgedriver().setup();
-                EdgeOptions eOpts = new EdgeOptions();
-                if (headless) eOpts.addArguments("--headless=new");
-                return new EdgeDriver(eOpts);
+                EdgeOptions opts = new EdgeOptions();
+                if (headless) opts.addArguments("--headless=new");
+                opts.addArguments("--window-size=1920,1080", "--disable-gpu");
+                return new EdgeDriver(opts);
+            }
             case "chrome":
-            default:
+            default: {
                 WebDriverManager.chromedriver().setup();
-                ChromeOptions cOpts = new ChromeOptions();
-                if (headless) cOpts.addArguments("--headless=new");
-                return new ChromeDriver(cOpts);
+                ChromeOptions opts = new ChromeOptions();
+                if (headless) opts.addArguments("--headless=new");
+                // Stabilizers for CI containers to avoid timeouts / crashes
+                opts.addArguments(
+                        "--disable-gpu",
+                        "--no-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--window-size=1920,1080"
+                );
+                return new ChromeDriver(opts);
+            }
         }
     }
 }
