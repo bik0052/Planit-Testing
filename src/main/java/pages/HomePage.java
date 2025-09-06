@@ -1,44 +1,40 @@
 package pages;
 
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
 public class HomePage {
-    private WebDriver driver;
-    private WebDriverWait wait;
+    private final WebDriver driver;
+    private final WebDriverWait wait;
 
-    // Use link text instead of fragile CSS ids
-    private By contactLink = By.linkText("Contact");
-    private By shopLink = By.linkText("Shop");
+    private final By linkContact = By.linkText("Contact");
+    private final By linkShop = By.linkText("Shop");
+    private final By ngView = By.cssSelector("div[ng-view]");
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
     }
 
     public void goToContactPage() {
-        WebElement contact = wait.until(ExpectedConditions.elementToBeClickable(contactLink));
-        scrollIntoView(contact);
-        contact.click();
-        waitForPageLoad();
+        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(linkContact));
+        scrollIntoView(el);
+        el.click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
     }
 
     public void goToShopPage() {
-        WebElement shop = wait.until(ExpectedConditions.elementToBeClickable(shopLink));
-        scrollIntoView(shop);
-        shop.click();
-        waitForPageLoad();
+        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(linkShop));
+        scrollIntoView(el);
+        el.click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
     }
 
     private void scrollIntoView(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-    }
-
-    private void waitForPageLoad() {
-        // Wait for Angular ng-view container to show up
-        By viewContainer = By.cssSelector("div[ng-view]");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(viewContainer));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
     }
 }
