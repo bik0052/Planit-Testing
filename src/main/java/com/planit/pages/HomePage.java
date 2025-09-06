@@ -1,42 +1,24 @@
-
 package com.planit.pages;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
-import java.time.Duration;
+public class HomePage extends BasePage {
 
-public class HomePage {
-    private final WebDriver driver;
-    private final WebDriverWait wait;
-
-    private final By linkContact = By.linkText("Contact");
-    private final By linkShop = By.linkText("Shop");
-    private final By ngView = By.cssSelector("div[ng-view]");
+    private final By navShop = By.linkText("Shop");
+    private final By navContact = By.linkText("Contact");
 
     public HomePage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
+        super(driver);
     }
 
-    public void goToContactPage() {
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(linkContact));
-        scrollIntoView(el);
-        el.click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
+    public ShopPage clickShop() {
+        click(navShop);
+        return new ShopPage(driver);
     }
 
-    public void goToShopPage() {
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(linkShop));
-        scrollIntoView(el);
-        el.click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(ngView));
-    }
-
-    private void scrollIntoView(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+    public ContactPage clickContact() {
+        click(navContact);
+        return new ContactPage(driver);
     }
 }
-
